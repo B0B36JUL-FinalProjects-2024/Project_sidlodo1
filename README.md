@@ -1,2 +1,13 @@
-# Project_sidlodo1
-Julia project for predicting survival on Titanic
+# Survival prediction in Titanic
+
+Used [dataset](https://www.kaggle.com/c/titanic).
+
+## Prediction methods
+
+### Random Forest Model
+
+### Logistic Regression
+
+###  Gradient Boosted Trees
+
+## Comparison of modelss
