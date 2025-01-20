@@ -9,17 +9,9 @@ using Statistics
 include("RandomForest.jl")
 include("LogReg.jl")
 include("GradBoost.jl")
-using .RandomForest
-using .LogReg
-using .GradBoost
-
-function process_data(trn_data_path::String)
-    data = CSV.File(trn_data_path) |> DataFrame
-
-    data.Sex .= (data.Sex .== "male") .+ 0  # Example: 0 for male, 1 for female
-
-    return data
-end
+import .RandomForest
+import .LogReg
+import .GradBoost
 
 function run_randforest(trn_data::DataFrame, tst_data::DataFrame)
     # train model and return trained model
