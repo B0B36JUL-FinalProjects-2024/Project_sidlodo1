@@ -4,13 +4,56 @@ using CSV
 using DataFrames
 using Statistics
 using Impute
+using CategoricalArrays
+using Random
 
-function process_data(trn_data_path::String)
-    data = CSV.File(trn_data_path) |> DataFrame
+include("../src/NewFeatures.jl")
+import .NewFeatures
 
-    data.Sex .= (data.Sex .== "male") .+ 0
+function load_csv(data_path::String)
+    df = CSV.File(data_path) |> DataFrame
+    return df
+end
 
-    return data
+function encode(df::DataFrame)
+    cols_to_encode = [:Fare, :Embarked, :Title]
+    for col in cols_to_encode
+        df[!, col] = categorical(df[!, col])
+    end
+    for col in cols_to_encode
+        df[!, col] = levelcode.(df[!, col])
+    end
+    return df
+end
+
+function process_and_split_data(df::DataFrame; test_ratio::Float64=0.2)
+    df = process_data(df)
+    
+    X = Matrix(df[:, [:Pclass, :Sex, :Age, :SibSp, :Parch, :Fare, :Embarked, :Title]])
+    y = df.Survived
+
+    # Split the data into training and test sets
+    n_samples = size(X, 1)
+    test_size = Int(floor(test_ratio * n_samples))
+    indices = shuffle(1:n_samples)
+    test_indices = indices[1:test_size]
+    train_indices = indices[test_size+1:end]
+
+    X_train = X[train_indices, :]
+    y_train = y[train_indices]
+    X_test = X[test_indices, :]
+    y_test = y[test_indices]
+
+    return X_train, y_train, X_test, y_test
+end
+
+function process_data(df::DataFrame)
+    df.Sex .= (df.Sex .== "male") .+ 0
+    df = delete_column(df, :Ticket)
+    df_cleaned = handle_missing_values(df, :Embarked, :Cabin, :Age)
+    df_cleaned = NewFeatures.add_new_features(df_cleaned)
+    df_encoded = encode(df_cleaned)
+    return df_encoded
 end
 
 function delete_rows(df::DataFrame, col::Symbol)
@@ -44,28 +87,28 @@ end
 function detect_missing_values(df::DataFrame)
     mis_val = [sum(ismissing, df[!, col]) for col in names(df)]
     
-    # Percentage of missing values
     mis_val_percent = [100 * mean(ismissing, df[!, col]) for col in names(df)]
     
-    # Create a DataFrame with the results
     mis_val_table = DataFrame(
         Column = names(df),
         MissingValues = mis_val,
         PercentMissing = mis_val_percent
     )
     
-    # Filter out columns with 0% missing values
     mis_val_table = filter(row -> row.PercentMissing > 0, mis_val_table)
     
-    # Sort by "% of Total Values" in descending order
     sort!(mis_val_table, :PercentMissing, rev = true)
     
-    # Print summary information
     println("Your selected dataframe has $(size(df, 2)) columns.")
-    println("There are $(size(mis_val_table, 1)) columns that have missing values.")
     
-    # Return the dataframe with missing information
     return mis_val_table
 end
+
+function classify_predictions(predictions::Vector, actual::Vector)
+    correct = sum(predictions .== actual)
+    accuracy = correct / length(actual)
+    return accuracy
+end
+
 
 end

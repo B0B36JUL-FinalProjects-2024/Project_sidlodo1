@@ -5,6 +5,9 @@ using DataFrames
 using Random
 using Statistics
 
+include("../src/Utils.jl")
+import .Utils
+
 # import models:
 include("RandomForest.jl")
 include("LogReg.jl")
@@ -13,40 +16,35 @@ import .RandomForest
 import .LogReg
 import .GradBoost
 
-function run_randforest(trn_data::DataFrame, tst_data::DataFrame)
-    # train model and return trained model
-    trn_model = RandomForest.train(trn_data)
-    # predict on test data
-    predictions = RandomForest.predict(trn_model, tst_data)
+function run_randforest(X_trn::Matrix, y_trn::Vector, tst_data::Matrix)
+    model = RandomForest.train(X_trn, y_trn)
+    predictions = RandomForest.predict(model, tst_data)
     return predictions
 end
 
 # Placeholder function to run Logistic Regression model (replace with actual code)
-function run_logreg(trn_data::DataFrame, tst_data::DataFrame)
-    # train model and return trained model
-    trn_model = LogReg.train(trn_data)
-    # predict on test data
-    predictions = LogReg.predict(trn_model, tst_data)
+function run_logreg(X_trn::Matrix, y_trn::Vector, tst_data::Matrix)
+    model = LogReg.train(X_trn, y_trn)
+    predictions = LogReg.predict(model, tst_data)
     return predictions
 end
 
 # Placeholder function to run Gradient Boosting model (replace with actual code)
-function run_gradboost(trn_data::DataFrame, tst_data::DataFrame)
-    # train model and return trained model
-    trn_model = GradBoost.train(trn_data)
-    # predict on test data
-    predictions = GradBoost.predict(trn_model, tst_data)
+function run_gradboost(X_trn::Matrix, y_trn::Vector, tst_data::Matrix)
+    model = GradBoost.train(X_trn, y_trn)
+    predictions = GradBoost.predict(model, tst_data)
     return predictions
 end
 
 
 function run_models(file_path::String)
-    trn_data = process_trn_data(file_path)
-    tst_data = process_tst_data(file_path)
+    path = joinpath(@__DIR__, file_path) |> normpath
+    df = Utils.load_csv(path)
+    X_trn, y_trn, X_tst, y_tst = Utils.process_and_split_data(df)
 
-    rf_predictions = run_random_forest(trn_data, tst_data)
-    lr_predictions = run_logistic_regression(trn_data, tst_data)
-    gbt_predictions = run_gradient_boosted_trees(trn_data, tst_data)
+    rf_predictions = run_random_forest(X_trn, y_trn, X_tst)
+    lr_predictions = run_logistic_regression(X_trn, y_trn, X_tst)
+    gbt_predictions = run_gradient_boosted_trees(X_trn, y_trn, X_tst)
 
     results = DataFrame(
         rf_predictions = rf_predictions,
