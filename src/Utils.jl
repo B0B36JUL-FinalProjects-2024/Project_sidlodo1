@@ -28,7 +28,7 @@ end
 
 function process_and_split_data(df::DataFrame; test_ratio::Float64=0.2)
     df = process_data(df)
-    
+
     X = Matrix(df[:, [:Pclass, :Sex, :Age, :SibSp, :Parch, :Fare, :Embarked, :Title]])
     y = df.Survived
 
@@ -49,7 +49,10 @@ end
 
 function process_data(df::DataFrame)
     df.Sex .= (df.Sex .== "male") .+ 0
-    df = delete_column(df, :Ticket)
+    if :Ticket in names(df)
+        df = delete_column(df, :Ticket)
+    end
+
     df_cleaned = handle_missing_values(df, :Embarked, :Cabin, :Age)
     df_cleaned = NewFeatures.add_new_features(df_cleaned)
     df_encoded = encode(df_cleaned)
@@ -102,6 +105,12 @@ function detect_missing_values(df::DataFrame)
     println("Your selected dataframe has $(size(df, 2)) columns.")
     
     return mis_val_table
+end
+
+function classify_predictions(predictions::BitVector, actual::Vector)
+    correct = sum(predictions .== actual)
+    accuracy = correct / length(actual)
+    return accuracy
 end
 
 function classify_predictions(predictions::Vector, actual::Vector)
