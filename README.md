@@ -1,9 +1,9 @@
 # Survival prediction in Titanic
 
-Used [dataset](https://www.kaggle.com/c/titanic).
+This project focuses on predicting passenger survival using machine learning models. The [Titanic dataset](https://www.kaggle.com/c/titanic) was used for this analysis. 
 
 ## Preprocessing
-The datasets were missing some values. It was therefore important to handle these missing values properly: either by deletion (only those whose proportion was very small) or imputation (replacement).
+To ensure accurate model training, missing values in the dataset were carefully handled through deletion or imputation based on their proportion and significance.
 After analysis of the data, it was decided to:
 - delete row: Embarked (0.2% missing), Fare(0.2% missing)
 - delete column: Cabin (77.1-78.2% missing), Ticket (not important)
@@ -11,12 +11,55 @@ After analysis of the data, it was decided to:
 
 Imputation was done using KNN algorithm from Impute module.
 
+### New Features
+
+To enhance the prediction accuracy, several new features were engineered from the existing data:
+- **FamilySize**: Created by combining the SibSp and Parch columns.
+- **IsAlone**: A binary feature indicating if a passenger is traveling alone.
+- **Title**: Extracted from the Name column to capture social status.
+
+These new features were added to the dataset using the functions defined in [src/NewFeatures.jl](src/NewFeatures.jl).
+
 ## Prediction methods
 
-### Random Forest Model
+### Logistic regression
+A logistic regression model was implemented to provide a baseline for comparison with more complex models.
+Two methods for logistic regression were used, Newton and Gradient descent. In the graph, it can be seen that Newton performs slightly better.
 
-### Logistic Regression
+![Logistic regression accuracy](./data/logreg.png)
 
-###  Gradient Boosted Trees
+### Decision trees
+Two decision trees models were chosen for the project:
+- Random forest: constructs multiple trees independetly on a randomly selected subset of training data and features
+- Gradient boosting trees: builds trees sequentially by training each new tree on residual errors made by previous trees
 
-## Comparison of modelss
+Both build and combine decision trees using Gini impurity as the criterion. According to this [article](https://quantdare.com/decision-trees-gini-vs-entropy/), Gini impurity has a shorter training time compared to entropy, making it a more efficient choice for this project.
+
+![Decision trees accuracy](./data/trees.png)
+
+## Instalation
+To install the survival prediction package, use the following command in the Julia REPL:
+```julia
+using Pkg;
+Pkg.add(path="absolute/path/to/src/SurvivalPrediction")
+```
+
+## Usage
+
+Example usage in `examples/examples.jl`:
+```julia
+include("../src/Utils.jl")
+import .Utils
+
+# prepare data
+path = joinpath(@__DIR__, "../data/train.csv") |> normpath
+df = Utils.load_csv(path)
+X_trn, y_trn, X_tst, y_tst = Utils.process_and_split_data(df; test_ratio=0.2)
+
+include("../src/SurvivalPrediction.jl")
+using .SurvivalPrediction
+
+# run models
+pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=100, method=:grad_descent)
+accuracy = Utils.classify_predictions(pred, y_tst)
+```

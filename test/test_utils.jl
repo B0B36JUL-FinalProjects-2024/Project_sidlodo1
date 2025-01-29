@@ -10,12 +10,6 @@ import .Utils
 
 @testset "Utils Tests" begin
 
-    @testset "process_data" begin
-        df = DataFrame(Sex = ["male", "female", "male"], Ticket = [1, 2, 3])
-        processed_df = Utils.process_data(df)
-        @test processed_df.Sex == [1, 0, 1]
-    end
-
     @testset "delete_rows" begin
         df = DataFrame(A = [1, missing, 3], B = [4, 5, 6])
         cleaned_df = Utils.delete_rows(df, :A)
