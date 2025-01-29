@@ -11,16 +11,16 @@ include("../src/SurvivalPrediction.jl")
 using .SurvivalPrediction
 
 # run models
-pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=100, method=:grad_descent)
+pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=10, method=:grad_descent)
 accuracy = Utils.classify_predictions(pred, y_tst)
 
-pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=100, method=:newton)
+pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=10, method=:newton)
 accuracy = Utils.classify_predictions(pred, y_tst)
 
-pred = SurvivalPrediction.run_randforest(X_trn, y_trn, X_tst; n_trees=10, max_depth=5, max_features=3)
+pred = SurvivalPrediction.run_randforest(X_trn, y_trn, X_tst; n_trees=15, max_depth=5, max_features=3)
 accuracy = Utils.classify_predictions(pred, y_tst)
 
-pred = SurvivalPrediction.run_gradboost(X_trn, y_trn, X_tst; n_trees=10, max_depth=5, max_features=3)
+pred = SurvivalPrediction.run_gradboost(X_trn, y_trn, X_tst; n_trees=15, max_depth=5, max_features=3)
 accuracy = Utils.classify_predictions(pred, y_tst)
 
 # run models and plot the results

@@ -38,10 +38,9 @@ Both build and combine decision trees using Gini impurity as the criterion. Acco
 ![Decision trees accuracy](./data/trees.png)
 
 ## Instalation
-To install the survival prediction package, use the following command in the Julia REPL:
+To install the survival prediction package, use the following command in the Julia REPL in project environemt:
 ```julia
-using Pkg;
-Pkg.add(path="absolute/path/to/src/SurvivalPrediction")
+add https://github.com/B0B36JUL-FinalProjects-2024/Project_sidlodo1.git
 ```
 
 ## Usage

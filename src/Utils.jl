@@ -100,7 +100,7 @@ function detect_missing_values(df::DataFrame)
     
     mis_val_table = filter(row -> row.PercentMissing > 0, mis_val_table)
     
-    sort!(mis_val_table, :PercentMissing, rev = true)
+    DataFrame.sort!(mis_val_table, :PercentMissing, rev = true)
     
     println("Your selected dataframe has $(size(df, 2)) columns.")
     
