@@ -113,11 +113,11 @@ function classify_predictions(predictions::BitVector, actual::Vector)
     return accuracy
 end
 
-function classify_predictions(predictions::Vector, actual::Vector)
-    correct = sum(predictions .== actual)
-    accuracy = correct / length(actual)
-    return accuracy
-end
+# function classify_predictions(predictions::Vector, actual::Vector)
+#     correct = sum(predictions .== actual)
+#     accuracy = correct / length(actual)
+#     return accuracy
+# end
 
 
 end

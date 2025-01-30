@@ -51,25 +51,51 @@ end
 """
 Trains a logistic regression model using gradient descent or Newton's method.
 """
-function train(X::Matrix, y::Vector; lr::Float64=0.01, n_iters::Int=100, method::Symbol=:grad_descent)
+model = LogisticRegression(lr=...)
+function train(X::Matrix, y::Vector; model::LogisticRegression, lr::Float64=0.01, n_iters::Int=100, method::Symbol=:grad_descent)
     n, m = size(X)
     X = normalize(X)
     w = zeros(m)
     b = 0.0
+
+    for _ in 1:n_iters
+        # update
+        # update(X, y, method)
+    end
 
     if method == :grad_descent
         for _ in 1:n_iters
             w, b = grad_descent(X, y, w, b, n, lr)
         end
         return w, b
-    else
+    elseif method ==:newton
         X_mult = [row*row' for row in eachrow(X)]
         for _ in 1:n_iters
             w = newton(X, y, X_mult, w)
         end
         return w
+    elseif method == :newmethod
+        # impelemntation
     end
 end
+
+# implementation of NewPerfectMethod
+# ...
+
+struct GradientDescent
+   lr::Float 
+end
+
+struct Newton end
+
+function update(X::AbstractMatrix, y, w, b, m::GradientDescent)
+end
+
+function update(X::AbstractMatrix, y, w, b, m::Newton)
+end
+
+
+
 
 function predict(w::Vector, b::Float64, X::Matrix)
     X = normalize(X)
