@@ -1,7 +1,28 @@
 module LogReg
 
+export train, predict
+
 using LinearAlgebra
 using Statistics
+
+include("ClassifierModels.jl")
+using .ClassifierModels
+
+abstract type LogRegOptimizationMethod end
+
+struct GradientDescentMethod <: LogRegOptimizationMethod
+    lr::Float64
+end
+
+struct NewtonMethod <: LogRegOptimizationMethod
+end
+
+struct LogRegModel <: ClassifierModels.Model
+    n_iters::Int
+    function LogRegModel(;n_iters=20)
+        new(n_iters)
+    end
+end
 
 """
 Applies the sigmoid function to a scalar or vector.
@@ -20,27 +41,25 @@ function normalize(X::Matrix)
     return (X .- means) ./ stds
 end
 
-# function compute_loss(labels::Vector, predictions::Vector)
-#     return -mean(labels .* log.(predictions) .+ (1 .- labels) .* log.(1 .- predictions))
-# end
-
 """
-Performs one step of gradient descent with regularization and learning rate decay.
+Performs one step of Gradient Descent method with learning rate.
 """
-function grad_descent(X::Matrix, y::Vector, w::Vector, b::Float64, n::Int, lr::Float64)
+function update!(X::Matrix, y::Vector, w::Vector, b::Float64, method::GradientDescentMethod)
+    n = size(X, 1)
     h = sigmoid.(X * w .+ b)
     dz = h - y
     dw = (1/n) * X' * dz
     db = (1/n) * sum(dz)
-    w -= lr * dw
-    b -= lr * db
+    w -= method.lr * dw
+    b -= method.lr * db
     return w, b
 end
 
 """
-Performs one step of Newton's method for optimizing weights.
+Performs one step of Newton method.
 """
-function newton(X::Matrix, y::Vector, X_mult::Vector, w::Vector)
+function update!(X::Matrix, y::Vector, w::Vector, method::NewtonMethod)
+    X_mult = [row*row' for row in eachrow(X)]
     h = sigmoid.(X * w)
     grad = X' * (h .- y) / size(X,1)
     hess = h .* (1 .- h) .* X_mult |> mean
@@ -49,26 +68,32 @@ function newton(X::Matrix, y::Vector, X_mult::Vector, w::Vector)
 end
 
 """
-Trains a logistic regression model using gradient descent or Newton's method.
+Trains a logistic regression model using Gradient Descent method.
 """
-function train(X::Matrix, y::Vector; lr::Float64=0.01, n_iters::Int=100, method::Symbol=:grad_descent)
-    n, m = size(X)
+function train(X::Matrix, y::Vector, model::LogRegModel, method::GradientDescentMethod)
     X = normalize(X)
-    w = zeros(m)
+    w = zeros(size(X, 2))
     b = 0.0
 
-    if method == :grad_descent
-        for _ in 1:n_iters
-            w, b = grad_descent(X, y, w, b, n, lr)
-        end
-        return w, b
-    else
-        X_mult = [row*row' for row in eachrow(X)]
-        for _ in 1:n_iters
-            w = newton(X, y, X_mult, w)
-        end
-        return w
+    for _ in 1:model.n_iters
+        w, b = update!(X, y, w, b, method)
     end
+
+    return w, b
+end
+
+"""
+Trains a logistic regression model using Newton method.
+"""
+function train(X::Matrix, y::Vector, model::LogRegModel, method::NewtonMethod)
+    X = normalize(X)
+    w = zeros(size(X, 2))
+
+    for _ in 1:model.n_iters
+        w = update!(X, y, w, method)
+    end
+
+    return w
 end
 
 function predict(w::Vector, b::Float64, X::Matrix)

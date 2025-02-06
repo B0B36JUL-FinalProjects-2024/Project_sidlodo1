@@ -1,7 +1,14 @@
 module Trees
 
+export RandomForestMethod, GradBoostMethod, build_tree, predict
+
 using Statistics
 using StatsBase
+
+abstract type EnsembleMethod end
+
+struct RandomForestMethod <: EnsembleMethod end
+struct GradBoostMethod <: EnsembleMethod end
 
 mutable struct TreeNode
     feature_idx::Int
@@ -76,14 +83,12 @@ end
 """
 Returns the value to predict for the leaf node.
 """
-function get_value(y::Vector, method::Symbol)
-    if method == :gradboost
-        return mean(y)
-    elseif method == :randomforest
-        return mode(y)
-    else
-        throw(ArgumentError("Invalid method"))
-    end
+function get_value(y::Vector, method::GradBoostMethod)
+    return mean(y)
+end
+
+function get_value(y::Vector, method::RandomForestMethod)
+    return mode(y)
 end
 
 """
@@ -104,7 +109,7 @@ end
 """
 Builds a decision tree using the CART algorithm.
 """
-function build_tree(X::Matrix, y::Vector, method::Symbol, max_depth::Int, min_samples_split::Int, max_features::Int)
+function build_tree(X::Matrix, y::Vector, method::EnsembleMethod, max_depth::Int, min_samples_split::Int, max_features::Int)
     if max_depth == 0 || length(y) < min_samples_split
         return TreeNode(-1, 0.0, nothing, nothing, get_value(y, method))
     end

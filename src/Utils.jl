@@ -107,17 +107,10 @@ function detect_missing_values(df::DataFrame)
     return mis_val_table
 end
 
-function classify_predictions(predictions::BitVector, actual::Vector)
+function classify_predictions(predictions::AbstractVector, actual::Vector)
     correct = sum(predictions .== actual)
     accuracy = correct / length(actual)
     return accuracy
 end
-
-function classify_predictions(predictions::Vector, actual::Vector)
-    correct = sum(predictions .== actual)
-    accuracy = correct / length(actual)
-    return accuracy
-end
-
 
 end

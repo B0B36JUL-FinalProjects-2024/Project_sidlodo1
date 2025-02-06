@@ -47,7 +47,7 @@ import .LogReg
 
     @testset "predict" begin
         w_new, b_new = LogReg.train(X, y, lr=0.01, n_iters=3, method=:grad_descent)
-        predictions = LogReg.predict(w_new, b_new, X, threshold=0.5)
+        predictions = LogReg.predict(w_new, b_new, X)
         @test predictions == [1, 1, 0, 1, 0, 0]
     end
 
