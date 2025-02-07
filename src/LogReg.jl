@@ -5,24 +5,8 @@ export train, predict
 using LinearAlgebra
 using Statistics
 
-include("ClassifierModels.jl")
-using .ClassifierModels
-
-abstract type LogRegOptimizationMethod end
-
-struct GradientDescentMethod <: LogRegOptimizationMethod
-    lr::Float64
-end
-
-struct NewtonMethod <: LogRegOptimizationMethod
-end
-
-struct LogRegModel <: ClassifierModels.Model
-    n_iters::Int
-    function LogRegModel(;n_iters=20)
-        new(n_iters)
-    end
-end
+# include("ClassifierModels.jl")
+using ..ClassifierModels
 
 """
 Applies the sigmoid function to a scalar or vector.

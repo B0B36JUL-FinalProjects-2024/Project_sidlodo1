@@ -1,14 +1,18 @@
 module Trees
 
-export RandomForestMethod, GradBoostMethod, build_tree, predict
+export RandomForestMethod, GradBoostMethod, build_tree, predict, TreeNode
+# export RandomForestMethod, GradBoostMethod, build_tree, predict
 
 using Statistics
 using StatsBase
 
-abstract type EnsembleMethod end
+# include("ClassifierModels.jl")
+using ..ClassifierModels
 
-struct RandomForestMethod <: EnsembleMethod end
-struct GradBoostMethod <: EnsembleMethod end
+# abstract type EnsembleMethod end
+
+# struct RandomForestMethod <: EnsembleMethod end
+# struct GradBoostMethod <: EnsembleMethod end
 
 mutable struct TreeNode
     feature_idx::Int
@@ -94,7 +98,7 @@ end
 """
 Predicts the class of the input data using the tree model.
 """
-function predict_tree(tree::Trees.TreeNode, x::Vector)
+function predict_tree(tree::TreeNode, x::Vector)
     if tree.left === nothing && tree.right === nothing
         return tree.value
     end

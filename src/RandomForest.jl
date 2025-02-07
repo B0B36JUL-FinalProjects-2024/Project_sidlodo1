@@ -6,20 +6,20 @@ using Random
 using DataFrames
 using StatsBase
 
-include("ClassifierModels.jl")
-import .ClassifierModels
+# include("ClassifierModels.jl")
+using ..ClassifierModels
 
 include("Trees.jl")
-import .Trees
+using .Trees
 
-mutable struct RandomForestModel <: ClassifierModels.Model
+mutable struct RandomForestModel <: Classifier
     n_trees::Int
     max_depth::Int
     min_samples_split::Int
     max_features::Int
-    trees::Vector{Trees.TreeNode}
+    trees::Vector{TreeNode}
 
-    function RandomForestModel(;n_trees::Int=10, max_depth::Int=5, min_samples_split::Int=2, max_features::Int=2, trees::Vector=Vector{Trees.TreeNode}())
+    function RandomForestModel(;n_trees::Int=10, max_depth::Int=5, min_samples_split::Int=2, max_features::Int=2, trees::Vector=Vector{TreeNode}())
         new(n_trees, max_depth, min_samples_split, max_features, trees)
     end
 end

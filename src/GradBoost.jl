@@ -5,22 +5,22 @@ export train!, predict
 using LinearAlgebra
 using Statistics
 
-include("ClassifierModels.jl")
-import .ClassifierModels
+# include("ClassifierModels.jl")
+using ..ClassifierModels
 
 include("Trees.jl")
-import .Trees
+using .Trees
 
-mutable struct GradBoostModel <: ClassifierModels.Model
+mutable struct GradBoostModel <: Classifier
     n_trees::Int
     max_depth::Int
     min_samples_split::Int
     max_features::Int
-    trees::Vector{Trees.TreeNode}
+    trees::Vector{TreeNode}
     lr::Float64
     initial_prediction::Float64
 
-    function GradBoostModel(;n_trees::Int=10, lr::Float64=0.1, max_depth::Int=5, min_samples_split::Int=2, max_features::Int=2, trees::Vector=Vector{Trees.TreeNode}(), initial_prediction::Float64=0.0)
+    function GradBoostModel(;n_trees::Int=10, lr::Float64=0.1, max_depth::Int=5, min_samples_split::Int=2, max_features::Int=2, trees::Vector=Vector{TreeNode}(), initial_prediction::Float64=0.0)
         new(n_trees, max_depth, min_samples_split, max_features, trees, lr, initial_prediction)
     end
 end

@@ -1,27 +1,29 @@
 module SurvivalPrediction
 
+export get_prediction, plot_logreg_acc, plot_trees
+
 using CSV
 using DataFrames
 using Random
 using Statistics
 using Plots
 
-include("../src/Utils.jl")
-import .Utils
+include("src/Utils.jl")
+using .Utils
 
 # import models:
-include("ClassifierModels.jl")
-import .ClassifierModels
-const CM = ClassifierModels
-include("LogReg.jl")
-import .LogReg
-const LR = LogReg
-include("RandomForest.jl")
-import .RandomForest
-const RF = RandomForest
-include("GradBoost.jl")
-import .GradBoost
-const GB = GradBoost
+include("src/ClassifierModels.jl")
+using .ClassifierModels
+CM = ClassifierModels
+include("src/LogReg.jl")
+using .LogReg
+LR = LogReg
+include("src/RandomForest.jl")
+using .RandomForest
+RF = RandomForest
+include("src/GradBoost.jl")
+using .GradBoost
+GB = GradBoost
 
 
 function get_prediction(model::LR.LogRegModel, method::LR.GradientDescentMethod, X_trn::Matrix, y_trn::Vector, X_tst::Matrix)
@@ -32,7 +34,7 @@ end
 
 function get_prediction(model::LR.LogRegModel, method::LR.NewtonMethod, X_trn::Matrix, y_trn::Vector, X_tst::Matrix)
     w = LR.train(X_trn, y_trn, model, method)
-    predictions = LR.predict(w, b, X_tst)
+    predictions = LR.predict(w, X_tst)
     return predictions
 end
 
@@ -88,12 +90,14 @@ function plot_trees(X_trn, y_trn, X_tst, y_tst, param_set)
         
         for iter in 1:params[:n_trees]
             # Random Forest
-            predictions_rf = run_randforest(X_trn, y_trn, X_tst; n_trees=iter, max_depth=params[:depth], max_features=params[:features])
+            model_rf = RF.RandomForestModel(n_trees=iter, max_depth=params[:depth], max_features=params[:features])
+            predictions_rf = get_prediction(model_rf, X_trn, y_trn, X_tst)
             accuracy_rf = Utils.classify_predictions(predictions_rf, y_tst)
             push!(accuracies_rf, accuracy_rf)
             
             # Gradient Boosting
-            predictions_gb = run_gradboost(X_trn, y_trn, X_tst; n_trees=iter, max_depth=params[:depth], max_features=params[:features], lr=params[:lr])
+            model_gb = GB.GradBoostModel(n_trees=iter, max_depth=params[:depth], max_features=params[:features])
+            predictions_gb = get_prediction(model_gb, X_trn, y_trn, X_tst)
             accuracy_gb = Utils.classify_predictions(predictions_gb, y_tst)
             push!(accuracies_gb, accuracy_gb)
         end
@@ -105,5 +109,27 @@ function plot_trees(X_trn, y_trn, X_tst, y_tst, param_set)
     ylabel!("Accuracy")
     title!("Decision trees accuracy")
 end
+
+# function report_classification(model::Classifier, method::LogRegOptimizationMethod, X_trn::Matrix, y_trn::Vector, X_tst::Matrix, y_tst::Vector)
+#     predictions = get_prediction(model, X_trn, y_trn, X_tst)
+#     accuracy = Utils.classify_predictions(predictions, y_tst)
+#     print("""
+#     Report classification
+#     ---------------------
+#     Model: $model
+#     Accuracy: $accuracy
+#     """)    
+# end
+
+# function report_classification(model::Classifier, X_trn::Matrix, y_trn::Vector, X_tst::Matrix, y_tst::Vector)
+#     predictions = get_prediction(model, X_trn, y_trn, X_tst)
+#     accuracy = Utils.classify_predictions(predictions, y_tst)
+#     print("""
+#     Report classification
+#     ---------------------
+#     Model: $model
+#     Accuracy: $accuracy
+#     """)    
+# end
 
 end
