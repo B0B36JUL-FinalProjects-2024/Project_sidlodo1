@@ -5,7 +5,6 @@ export train, predict
 using LinearAlgebra
 using Statistics
 
-# include("ClassifierModels.jl")
 using ..ClassifierModels
 
 """

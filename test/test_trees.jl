@@ -2,8 +2,9 @@ module test_Trees
 
 using Test
 
+include("../src/ClassifierModels.jl")
 include("../src/Trees.jl")
-import .Trees
+using ..Trees
 
 @testset "Trees Tests" begin
 
@@ -39,7 +40,8 @@ import .Trees
     end
 
     @testset "build_tree" begin
-        tree_tmp = Trees.build_tree(X, y, :gradboost, 2, 2, 2)
+        method = Trees.GradBoostMethod()
+        tree_tmp = Trees.build_tree(X, y, method, 2, 2, 2)
         @test tree_tmp.feature_idx == 2
         @test tree_tmp.threshold == 5.0
     end
@@ -50,9 +52,11 @@ import .Trees
     end
 
     @testset "get_value" begin
+        method_forest = Trees.RandomForestMethod()
+        method_grad = Trees.GradBoostMethod()
         y = [1, 1, 0, 0, 1]
-        @test Trees.get_value(y, :randomforest) == 1
-        @test Trees.get_value(y, :gradboost) == 0.6
+        @test Trees.get_value(y, method_forest) == 1
+        @test Trees.get_value(y, method_grad) == 0.6
     end
 end
 

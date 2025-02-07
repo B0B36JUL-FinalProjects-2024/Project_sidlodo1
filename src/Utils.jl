@@ -1,5 +1,7 @@
 module Utils
 
+export load_data_and_split, classify_predictions
+
 using CSV
 using DataFrames
 using Statistics
@@ -9,6 +11,12 @@ using Random
 
 include("../src/NewFeatures.jl")
 import .NewFeatures
+
+function load_data_and_split(path::String; test_ratio::Float64=0.2)
+    df = load_csv(path)
+    X_train, y_train, X_test, y_test = process_and_split_data(df; test_ratio=test_ratio)
+    return X_train, y_train, X_test, y_test
+end
 
 function load_csv(data_path::String)
     df = CSV.File(data_path) |> DataFrame

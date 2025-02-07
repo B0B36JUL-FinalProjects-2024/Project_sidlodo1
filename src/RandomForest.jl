@@ -6,23 +6,8 @@ using Random
 using DataFrames
 using StatsBase
 
-# include("ClassifierModels.jl")
 using ..ClassifierModels
-
-include("Trees.jl")
-using .Trees
-
-mutable struct RandomForestModel <: Classifier
-    n_trees::Int
-    max_depth::Int
-    min_samples_split::Int
-    max_features::Int
-    trees::Vector{TreeNode}
-
-    function RandomForestModel(;n_trees::Int=10, max_depth::Int=5, min_samples_split::Int=2, max_features::Int=2, trees::Vector=Vector{TreeNode}())
-        new(n_trees, max_depth, min_samples_split, max_features, trees)
-    end
-end
+using ..Trees
 
 """
 Trains a random forest model where n_trees are built independently on a random subset of the data and features.
@@ -35,7 +20,7 @@ function train!(X::Matrix, y::Vector, model::RandomForestModel)
         X_sample = X[sampled_indices, :]
         y_sample = y[sampled_indices]
         
-        tree = Trees.build_tree(X_sample, y_sample, Trees.RandomForestMethod(), model.max_depth, model.min_samples_split, model.max_features)
+        tree = Trees.build_tree(X_sample, y_sample, RandomForestMethod(), model.max_depth, model.min_samples_split, model.max_features)
         push!(model.trees, tree)
     end
     

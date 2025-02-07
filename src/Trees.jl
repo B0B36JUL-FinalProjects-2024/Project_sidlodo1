@@ -1,26 +1,12 @@
 module Trees
 
-export RandomForestMethod, GradBoostMethod, build_tree, predict, TreeNode
+export build_tree, predict
 # export RandomForestMethod, GradBoostMethod, build_tree, predict
 
 using Statistics
 using StatsBase
 
-# include("ClassifierModels.jl")
 using ..ClassifierModels
-
-# abstract type EnsembleMethod end
-
-# struct RandomForestMethod <: EnsembleMethod end
-# struct GradBoostMethod <: EnsembleMethod end
-
-mutable struct TreeNode
-    feature_idx::Int
-    threshold::Float64
-    left::Union{TreeNode, Nothing}
-    right::Union{TreeNode, Nothing}
-    value::Union{Float64, Nothing}
-end
 
 """
 Calculates the Gini impurity for a set of labels.

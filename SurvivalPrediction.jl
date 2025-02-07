@@ -18,13 +18,13 @@ CM = ClassifierModels
 include("src/LogReg.jl")
 using .LogReg
 LR = LogReg
+include("src/Trees.jl")
 include("src/RandomForest.jl")
 using .RandomForest
 RF = RandomForest
 include("src/GradBoost.jl")
 using .GradBoost
 GB = GradBoost
-
 
 function get_prediction(model::LR.LogRegModel, method::LR.GradientDescentMethod, X_trn::Matrix, y_trn::Vector, X_tst::Matrix)
     w, b = LR.train(X_trn, y_trn, model, method)
@@ -68,7 +68,7 @@ function plot_logreg_acc(X_trn, y_trn, X_tst, y_tst, param_set)
             push!(accuracies_newton, accuracy_newton)
             
             # Gradient descent
-            method_grad = LR.GradientDescentMethod(params[:lr])
+            method_grad = LR.GradientDescentMethod(;lr=params[:lr])
             predictions_grad = get_prediction(model, method_grad, X_trn, y_trn, X_tst)
             accuracy_grad = Utils.classify_predictions(predictions_grad, y_tst)
             push!(accuracies_grad, accuracy_grad)
@@ -90,13 +90,13 @@ function plot_trees(X_trn, y_trn, X_tst, y_tst, param_set)
         
         for iter in 1:params[:n_trees]
             # Random Forest
-            model_rf = RF.RandomForestModel(n_trees=iter, max_depth=params[:depth], max_features=params[:features])
+            model_rf = RF.RandomForestModel(;n_trees=iter, max_depth=params[:depth], max_features=params[:features])
             predictions_rf = get_prediction(model_rf, X_trn, y_trn, X_tst)
             accuracy_rf = Utils.classify_predictions(predictions_rf, y_tst)
             push!(accuracies_rf, accuracy_rf)
             
             # Gradient Boosting
-            model_gb = GB.GradBoostModel(n_trees=iter, max_depth=params[:depth], max_features=params[:features])
+            model_gb = GB.GradBoostModel(;n_trees=iter, max_depth=params[:depth], max_features=params[:features])
             predictions_gb = get_prediction(model_gb, X_trn, y_trn, X_tst)
             accuracy_gb = Utils.classify_predictions(predictions_gb, y_tst)
             push!(accuracies_gb, accuracy_gb)
@@ -110,26 +110,27 @@ function plot_trees(X_trn, y_trn, X_tst, y_tst, param_set)
     title!("Decision trees accuracy")
 end
 
-# function report_classification(model::Classifier, method::LogRegOptimizationMethod, X_trn::Matrix, y_trn::Vector, X_tst::Matrix, y_tst::Vector)
-#     predictions = get_prediction(model, X_trn, y_trn, X_tst)
-#     accuracy = Utils.classify_predictions(predictions, y_tst)
-#     print("""
-#     Report classification
-#     ---------------------
-#     Model: $model
-#     Accuracy: $accuracy
-#     """)    
-# end
+function report_classification(model::LogRegModel, method::LogRegOptimizationMethod, X_trn::Matrix, y_trn::Vector, X_tst::Matrix, y_tst::Vector)
+    predictions = get_prediction(model, method, X_trn, y_trn, X_tst)
+    accuracy = Utils.classify_predictions(predictions, y_tst)
+    print("""
+    Report classification
+    ---------------------
+    Model: $(model.name) classifier
+    Method: $(method.name) method
+    Accuracy: $(round(accuracy*100, digits=2)) %
+    """)    
+end
 
-# function report_classification(model::Classifier, X_trn::Matrix, y_trn::Vector, X_tst::Matrix, y_tst::Vector)
-#     predictions = get_prediction(model, X_trn, y_trn, X_tst)
-#     accuracy = Utils.classify_predictions(predictions, y_tst)
-#     print("""
-#     Report classification
-#     ---------------------
-#     Model: $model
-#     Accuracy: $accuracy
-#     """)    
-# end
+function report_classification(model::DecisionTree, X_trn::Matrix, y_trn::Vector, X_tst::Matrix, y_tst::Vector)
+    predictions = get_prediction(model, X_trn, y_trn, X_tst)
+    accuracy = Utils.classify_predictions(predictions, y_tst)
+    print("""
+    Report classification
+    ---------------------
+    Model: $(model.name) classifier
+    Accuracy: $(round(accuracy*100, digits=2)) %
+    """)    
+end
 
 end
