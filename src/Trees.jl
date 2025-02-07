@@ -1,15 +1,12 @@
 module Trees
 
+export build_tree, predict
+# export RandomForestMethod, GradBoostMethod, build_tree, predict
+
 using Statistics
 using StatsBase
 
-mutable struct TreeNode
-    feature_idx::Int
-    threshold::Float64
-    left::Union{TreeNode, Nothing}
-    right::Union{TreeNode, Nothing}
-    value::Union{Float64, Nothing}
-end
+using ..ClassifierModels
 
 """
 Calculates the Gini impurity for a set of labels.
@@ -76,20 +73,18 @@ end
 """
 Returns the value to predict for the leaf node.
 """
-function get_value(y::Vector, method::Symbol)
-    if method == :gradboost
-        return mean(y)
-    elseif method == :randomforest
-        return mode(y)
-    else
-        throw(ArgumentError("Invalid method"))
-    end
+function get_value(y::Vector, method::GradBoostMethod)
+    return mean(y)
+end
+
+function get_value(y::Vector, method::RandomForestMethod)
+    return mode(y)
 end
 
 """
 Predicts the class of the input data using the tree model.
 """
-function predict_tree(tree::Trees.TreeNode, x::Vector)
+function predict_tree(tree::TreeNode, x::Vector)
     if tree.left === nothing && tree.right === nothing
         return tree.value
     end
@@ -104,7 +99,7 @@ end
 """
 Builds a decision tree using the CART algorithm.
 """
-function build_tree(X::Matrix, y::Vector, method::Symbol, max_depth::Int, min_samples_split::Int, max_features::Int)
+function build_tree(X::Matrix, y::Vector, method::EnsembleMethod, max_depth::Int, min_samples_split::Int, max_features::Int)
     if max_depth == 0 || length(y) < min_samples_split
         return TreeNode(-1, 0.0, nothing, nothing, get_value(y, method))
     end

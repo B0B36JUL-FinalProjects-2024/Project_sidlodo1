@@ -1,26 +1,26 @@
-include("../src/Utils.jl")
-import .Utils
-
+include("../SurvivalPrediction.jl")
+using .SurvivalPrediction
+SP = SurvivalPrediction
 # prepare data
 
 path = joinpath(@__DIR__, "../data/train.csv") |> normpath
-df = Utils.load_csv(path)
-X_trn, y_trn, X_tst, y_tst = Utils.process_and_split_data(df; test_ratio=0.2)
-
-include("../src/SurvivalPrediction.jl")
-using .SurvivalPrediction
+X_trn, y_trn, X_tst, y_tst = SP.Utils.load_data_and_split(path; test_ratio=0.2)
 
 # run models
-pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=10, method=:grad_descent)
+model_LR = SP.LR.LogRegModel(n_iters=100)
+
+method_grad = SP.LR.GradientDescentMethod()
+pred = SP.get_prediction(model_LR, method_grad, X_trn, y_trn, X_tst)
 accuracy = Utils.classify_predictions(pred, y_tst)
 
-pred = SurvivalPrediction.run_logreg(X_trn, y_trn, X_tst; lr=0.01, n_iters=10, method=:newton)
-accuracy = Utils.classify_predictions(pred, y_tst)
+method_new = SP.LR.NewtonMethod()
+SP.report_classification(model_LR, method_new, X_trn, y_trn, X_tst, y_tst)
 
-pred = SurvivalPrediction.run_randforest(X_trn, y_trn, X_tst; n_trees=15, max_depth=5, max_features=3)
-accuracy = Utils.classify_predictions(pred, y_tst)
+model_RF = SP.RF.RandomForestModel()
+SP.report_classification(model_RF, X_trn, y_trn, X_tst, y_tst)
 
-pred = SurvivalPrediction.run_gradboost(X_trn, y_trn, X_tst; n_trees=15, max_depth=5, max_features=3)
+model_GB = SP.GB.GradBoostModel()
+pred = SP.get_prediction(model_GB, X_trn, y_trn, X_tst)
 accuracy = Utils.classify_predictions(pred, y_tst)
 
 # run models and plot the results
@@ -30,12 +30,11 @@ param_sets = [
     Dict(:lr => 0.1, :n_iters => 20)
 ]
 
-SurvivalPrediction.plot_logreg_acc(X_trn, y_trn, X_tst, y_tst, param_sets)
+SP.plot_logreg_acc(X_trn, y_trn, X_tst, y_tst, param_sets)
 
 param_sets = [
     Dict(:n_trees => 20, :depth => 5, :features => 3),
     Dict(:n_trees => 20, :depth => 10, :features => 6)
 ]
 
-SurvivalPrediction.plot_trees(X_trn, y_trn, X_tst, y_tst, param_sets)
-
+SP.plot_trees(X_trn, y_trn, X_tst, y_tst, param_sets)
