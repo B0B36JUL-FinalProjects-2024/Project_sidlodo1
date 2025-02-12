@@ -8,21 +8,21 @@ using Random
 using Statistics
 using Plots
 
-include("src/Utils.jl")
+include("Utils.jl")
 using .Utils
 
 # import models:
-include("src/ClassifierModels.jl")
+include("ClassifierModels.jl")
 using .ClassifierModels
 CM = ClassifierModels
-include("src/LogReg.jl")
+include("LogReg.jl")
 using .LogReg
 LR = LogReg
-include("src/Trees.jl")
-include("src/RandomForest.jl")
+include("Trees.jl")
+include("RandomForest.jl")
 using .RandomForest
 RF = RandomForest
-include("src/GradBoost.jl")
+include("GradBoost.jl")
 using .GradBoost
 GB = GradBoost
 

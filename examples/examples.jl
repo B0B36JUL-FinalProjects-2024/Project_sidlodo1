@@ -1,4 +1,4 @@
-include("../SurvivalPrediction.jl")
+include("../src/SurvivalPrediction.jl")
 using .SurvivalPrediction
 SP = SurvivalPrediction
 # prepare data
@@ -11,7 +11,7 @@ model_LR = SP.LR.LogRegModel(n_iters=100)
 
 method_grad = SP.LR.GradientDescentMethod()
 pred = SP.get_prediction(model_LR, method_grad, X_trn, y_trn, X_tst)
-accuracy = Utils.classify_predictions(pred, y_tst)
+accuracy = SP.Utils.classify_predictions(pred, y_tst)
 
 method_new = SP.LR.NewtonMethod()
 SP.report_classification(model_LR, method_new, X_trn, y_trn, X_tst, y_tst)
@@ -21,7 +21,7 @@ SP.report_classification(model_RF, X_trn, y_trn, X_tst, y_tst)
 
 model_GB = SP.GB.GradBoostModel()
 pred = SP.get_prediction(model_GB, X_trn, y_trn, X_tst)
-accuracy = Utils.classify_predictions(pred, y_tst)
+accuracy = SP.Utils.classify_predictions(pred, y_tst)
 
 # run models and plot the results
 

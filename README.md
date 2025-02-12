@@ -56,7 +56,7 @@ df = Utils.load_csv(path)
 X_trn, y_trn, X_tst, y_tst = Utils.process_and_split_data(df; test_ratio=0.2)
 
 
-include("SurvivalPrediction.jl")
+include("../src/SurvivalPrediction.jl")
 using .SurvivalPrediction
 SP = SurvivalPrediction
 
