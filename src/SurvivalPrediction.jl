@@ -1,6 +1,6 @@
 module SurvivalPrediction
 
-export get_prediction, plot_logreg_acc, plot_trees
+export load_data_and_split, LogRegModel, GradientDescentMethod, NewtonMethod, RandomForestModel, GradBoostModel, get_prediction, classify_predictions, report_classification, plot_logreg_acc, plot_trees
 
 using CSV
 using DataFrames
@@ -8,21 +8,21 @@ using Random
 using Statistics
 using Plots
 
-include("src/Utils.jl")
+include("Utils.jl")
 using .Utils
 
 # import models:
-include("src/ClassifierModels.jl")
+include("ClassifierModels.jl")
 using .ClassifierModels
 CM = ClassifierModels
-include("src/LogReg.jl")
+include("LogReg.jl")
 using .LogReg
 LR = LogReg
-include("src/Trees.jl")
-include("src/RandomForest.jl")
+include("Trees.jl")
+include("RandomForest.jl")
 using .RandomForest
 RF = RandomForest
-include("src/GradBoost.jl")
+include("GradBoost.jl")
 using .GradBoost
 GB = GradBoost
 

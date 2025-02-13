@@ -47,26 +47,23 @@ add https://github.com/B0B36JUL-FinalProjects-2024/Project_sidlodo1.git
 
 Example usage in `examples/examples.jl`:
 ```julia
-include("src/Utils.jl")
-using .Utils
-
-# prepare data
-path = joinpath(@__DIR__, "../data/train.csv") |> normpath
-df = Utils.load_csv(path)
-X_trn, y_trn, X_tst, y_tst = Utils.process_and_split_data(df; test_ratio=0.2)
-
-
-include("SurvivalPrediction.jl")
+include("../src/SurvivalPrediction.jl")
 using .SurvivalPrediction
 SP = SurvivalPrediction
+# prepare data
+
+path = joinpath(@__DIR__, "../data/train.csv") |> normpath
+X_trn, y_trn, X_tst, y_tst = SP.Utils.load_data_and_split(path; test_ratio=0.2)
 
 # run models
 model_LR = SP.LR.LogRegModel(n_iters=100)
 
-method_grad = SP.LR.GradientDescentMethod(0.01)
+method_grad = SP.LR.GradientDescentMethod()
 pred = SP.get_prediction(model_LR, method_grad, X_trn, y_trn, X_tst)
-accuracy = Utils.classify_predictions(pred, y_tst)
+accuracy = SP.Utils.classify_predictions(pred, y_tst)
 
-model_RF = SP.RF.RandomForestModel()
-SP.report_classification(model_RF, X_trn, y_trn, X_tst, y_tst)
+method_new = SP.LR.NewtonMethod()
+SP.report_classification(model_LR, method_new, X_trn, y_trn, X_tst, y_tst)
+
+...
 ```
