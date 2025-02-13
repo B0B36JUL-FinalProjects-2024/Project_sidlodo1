@@ -1,6 +1,6 @@
 module SurvivalPrediction
 
-export get_prediction, plot_logreg_acc, plot_trees
+export load_data_and_split, LogRegModel, GradientDescentMethod, NewtonMethod, RandomForestModel, GradBoostModel, get_prediction, classify_predictions, report_classification, plot_logreg_acc, plot_trees
 
 using CSV
 using DataFrames
