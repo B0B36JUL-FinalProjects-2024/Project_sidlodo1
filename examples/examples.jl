@@ -2,6 +2,7 @@ using SurvivalPrediction
 # prepare data
 
 path = joinpath(@__DIR__, "../data/train.csv") |> normpath
+
 X_trn, y_trn, X_tst, y_tst = load_data_and_split(path; test_ratio=0.2)
 
 # run models
